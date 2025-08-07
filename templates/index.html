@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack Optimizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<div class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-2xl">
+
+        <div class="text-center mb-6">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">Pack Optimizer</h1>
+            <p class="text-gray-600 dark:text-gray-400">Find the most efficient way to pack your items.</p>
+        </div>
+
+        <div class="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Available Pack Sizes:</p>
+            <ul class="flex flex-wrap gap-2 text-center text-sm font-semibold">
+                <li class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full">250</li>
+                <li class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full">500</li>
+                <li class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full">1000</li>
+                <li class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full">2000</li>
+                <li class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full">5000</li>
+            </ul>
+        </div>
+
+        <form id="optimizer-form" class="space-y-4">
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Items ordered:
+                </label>
+                <input
+                        type="number"
+                        name="quantity"
+                        id="quantity"
+                        required
+                        min="1"
+                        step="1"
+                        max="2147483647"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        placeholder="Enter quantity"
+                >
+            </div>
+
+            <button
+                    type="submit"
+                    id="submit-button"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Submit
+            </button>
+        </form>
+
+        <div id="error-message" class="mt-4 hidden p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+            <span class="font-medium">Error:</span>
+            <span id="error-text"></span>
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-2">Number of packs:</h2>
+            <div id="result-box" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md border border-gray-200 dark:border-gray-600 min-h-[5rem]">
+                <p class="text-gray-500 dark:text-gray-400">Enter a quantity and click submit to see the optimal pack distribution.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('optimizer-form');
+    const resultBox = document.getElementById('result-box');
+    const submitButton = document.getElementById('submit-button');
+    const errorMessageDiv = document.getElementById('error-message');
+    const errorTextSpan = document.getElementById('error-text');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault(); // prevent page reload
+
+        // Reset error state
+        errorMessageDiv.classList.add('hidden');
+
+        const quantityInput = document.getElementById('quantity');
+        const quantity = quantityInput.value;
+
+        // Client-side validation
+        if (quantity === "" || isNaN(quantity) || quantity <= 0 || !Number.isInteger(Number(quantity))) {
+            errorTextSpan.textContent = 'Please enter a valid positive integer for the quantity.';
+            errorMessageDiv.classList.remove('hidden');
+            return;
+        }
+
+        const maxInt = 2147483647; // Max value for a signed 32-bit integer
+        if (Number(quantity) > maxInt) {
+            errorTextSpan.textContent = 'The quantity is too large. Please enter a number smaller than ' + maxInt + '.';
+            errorMessageDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Show a loading state and disable the button
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Calculating...';
+        resultBox.innerHTML = '<p class="text-center text-indigo-600 dark:text-indigo-400">Calculating...</p>';
+
+        const url = `/api/v1/packs/calculate`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: Number(quantity) })
+            });
+
+            const data = await response.json();
+
+            // Re-enable the button after the fetch is complete
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Submit';
+
+            // Clear the result box and build new content
+            resultBox.innerHTML = '';
+
+            // Check for a non-ok response and display the specific API error message
+            if (!response.ok) {
+                const errorMessage = data.error || "An unknown error occurred.";
+                errorTextSpan.textContent = errorMessage;
+                errorMessageDiv.classList.remove('hidden');
+                resultBox.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No results to display due to an error.</p>';
+                return;
+            }
+
+            // The new API response is a structured object
+            const { total_packs, total_items, remaining_items, packs } = data;
+
+            // Add summary section
+            const summary = document.createElement('div');
+            summary.className = 'text-center mb-6 space-y-1';
+            summary.innerHTML = `
+                <p class="text-lg font-medium">Total Packs: <span class="font-bold text-indigo-600 dark:text-indigo-400">${total_packs}</span></p>
+                <p class="text-lg font-medium">Total Items: <span class="font-bold text-indigo-600 dark:text-indigo-400">${total_items}</span></p>
+            `;
+            if (remaining_items > 0) {
+                summary.innerHTML += `<p class="text-lg font-medium text-red-500 dark:text-red-400">Remaining Items: <span class="font-bold">${remaining_items}</span></p>`;
+            }
+            resultBox.appendChild(summary);
+
+            // Create and append the pack list
+            if (packs && packs.length > 0) {
+                const packList = document.createElement('div');
+                packList.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4';
+
+                packs.forEach(pack => {
+                    const packItem = document.createElement('div');
+                    packItem.className = 'bg-gray-200 dark:bg-gray-600 p-4 rounded-md shadow-sm flex justify-between items-center';
+                    packItem.innerHTML = `
+                        <span class="text-lg font-bold">${pack.size} items</span>
+                        <span class="text-xl font-extrabold text-indigo-700 dark:text-indigo-300">${pack.count}x</span>
+                    `;
+                    packList.appendChild(packItem);
+                });
+                resultBox.appendChild(packList);
+            } else {
+                resultBox.innerHTML += '<p class="text-gray-500 dark:text-gray-400">No optimal packing found for the given quantity.</p>';
+            }
+        } catch (error) {
+            // Re-enable the button and display a generic error message
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Submit';
+            errorTextSpan.textContent = error.message;
+            errorMessageDiv.classList.remove('hidden');
+            resultBox.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No results to display due to an error.</p>';
+        }
+    });
+</script>
+
+</body>
+</html>
