@@ -51,7 +51,7 @@ The project is structured according to the principles of Clean Architecture to e
 
     ```bash
     git clone https://github.com/kiarashfz/pack_optimizer
-    cd pack-optimizer
+    cd pack_optimizer
     ```
 
 2.  **Rename `.env.sample` file in the root of project to `.env`.**
