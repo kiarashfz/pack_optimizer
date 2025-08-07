@@ -79,6 +79,14 @@ The included `Makefile` provides convenient commands for managing the applicatio
 * `make logs`: Streams the logs for all services.
 * `make test`: Runs all unit and integration tests with verbose output and race detection.
 
+### 🟧 Postman Collection
+
+A ready-to-use Postman collection is available in the `docs/api` directory.
+
+You can import it directly into your Postman to test the API endpoints.
+
+
+
 ### 🧪 How to Test
 
 All tests are located in the root of the project under the test directory. This includes both:
