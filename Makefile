@@ -5,7 +5,7 @@ GOLANGCI_LINT := $(shell which golangci-lint 2>/dev/null || echo $(shell go env 
 # Locate the goimports executable
 GOIMPORTS := $(shell which goimports 2>/dev/null || echo $(shell go env GOPATH)/bin/goimports)
 
-# Rule to install golangci-lint if it's not found
+# Rule to install golangci-lint if it's not found.
 $(GOLANGCI_LINT):
 	@echo "Installing golangci-lint..."
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
