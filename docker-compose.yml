@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14-alpine
+    image: postgres:15.13-bookworm
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -32,8 +32,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5' # Limit to half a CPU core
-          memory: 512M # Limit memory to 256 megabytes
+          cpus: '0.7' # Limit to half a CPU core
+          memory: 512M # Limit memory to 512 megabytes
 
 volumes:
   postgres_data:

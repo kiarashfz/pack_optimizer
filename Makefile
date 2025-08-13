@@ -31,7 +31,7 @@ up:
 
 # Stop and remove containers, networks, volumes, and images created by up
 down:
-	docker compose down
+	docker compose down --volumes --remove-orphans
 
 # Restart services
 restart: down up

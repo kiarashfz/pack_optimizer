@@ -1,6 +1,6 @@
 # Stage 1: The builder stage.
 # We use a specific version for reproducibility and security.
-FROM golang:1.23.4-bullseye AS builder
+FROM golang:1.25.0-bookworm AS builder
 
 WORKDIR /app
 
