@@ -22,6 +22,7 @@ lint: $(GOLANGCI_LINT) $(GOIMPORTS)
 	@echo "Running golangci-lint..."
 	$(GOLANGCI_LINT) run ./...
 
+
 VENV_DIR := .venv
 dev-setup:
 	@echo "Checking for Python 3..."
