@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/pack_optimizer ./
 
 # --- Stage 2: The final runtime image. ---
 # Use a minimal Alpine Linux image for a tiny and secure final image.
-FROM alpine:3.18.4
+FROM alpine:3.22.1
 
 # Install ca-certificates and create a non-root user in a single layer.
 RUN apk add --no-cache ca-certificates \
