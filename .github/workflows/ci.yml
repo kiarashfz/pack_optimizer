@@ -1,0 +1,79 @@
+name: Go CI
+
+# This workflow will be triggered on pushes and pull requests to the master and develop branches.
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+# Define important environment variables at the workflow level for easy maintenance.
+env:
+  GO_VERSION: '1.25.0'
+  APP_NAME: 'pack_optimizer'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # I fetch the full history to make git-based tools work correctly.
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run Linting
+        run: make lint
+
+  # The 'test' job runs all unit and integration tests with race detection.
+  # It runs in parallel with the 'lint' job for maximum efficiency.
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run All Tests
+        run: make test
+
+  # The 'build' job compiles the application into a binary.
+  # This job will only run if BOTH the 'lint' and 'test' jobs have passed successfully.
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]  # This is the critical dependency.
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build Application
+        run: go build -o ${{ env.APP_NAME }} ./cmd/main.go
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}
+          path: ${{ env.APP_NAME }}
