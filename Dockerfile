@@ -25,8 +25,6 @@ RUN apk add --no-cache ca-certificates \
     && addgroup -S appgroup \
     && adduser -S appuser -G appgroup
 
-# Create a non-root user and group to run the application securely.
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
 # Set the working directory to a path accessible by the new user.
