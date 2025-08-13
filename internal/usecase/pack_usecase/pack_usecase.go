@@ -42,12 +42,16 @@ func (uc *PackUseCase) CalculatePacks(ctx context.Context, orderQty int) (Calcul
 		return CalculatePacksOutput{}, err
 	}
 
-	var packSizes []int
+	packSizes := make([]int, 0, len(packs))
 	for _, p := range packs {
 		packSizes = append(packSizes, p.Size)
 	}
 
-	res := findBestPackCombination(orderQty, packSizes)
+	res, err := findBestPackCombination(orderQty, packSizes)
+	if err != nil {
+		return CalculatePacksOutput{}, err
+	}
+
 	var packDetails []Pack
 	for i, count := range res.packCount {
 		if count > 0 {
@@ -74,7 +78,7 @@ func (uc *PackUseCase) CalculatePacks(ctx context.Context, orderQty int) (Calcul
 //
 // Returns:
 //   - A pointer to a Node struct representing the optimal combination of packs.
-func findBestPackCombination(order int, packSizes []int) *Node {
+func findBestPackCombination(order int, packSizes []int) (*Node, error) {
 	sort.Ints(packSizes) // Sort pack sizes in ascending order for easier index mapping.
 	maxPack := packSizes[len(packSizes)-1]
 
@@ -92,11 +96,14 @@ func findBestPackCombination(order int, packSizes []int) *Node {
 	heap.Push(pq, initial)
 
 	for pq.Len() > 0 {
-		curr := heap.Pop(pq).(*Node)
+		curr, ok := heap.Pop(pq).(*Node)
+		if !ok {
+			return nil, errors.New("failed to pop from priority queue")
+		}
 
 		// If the current state satisfies the order, it's optimal.
 		if curr.totalItems >= order {
-			return curr
+			return curr, nil
 		}
 
 		for i, size := range packSizes {
@@ -121,5 +128,5 @@ func findBestPackCombination(order int, packSizes []int) *Node {
 		}
 	}
 
-	return nil // Return nil if no combination is found
+	return nil, nil // Return nil if no combination is found
 }

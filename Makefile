@@ -22,22 +22,6 @@ lint: $(GOLANGCI_LINT) $(GOIMPORTS)
 	@echo "Running golangci-lint..."
 	$(GOLANGCI_LINT) run ./...
 
-
-VENV_DIR := .venv
-dev-setup:
-	@echo "Checking for Python 3..."
-	@command -v python3 >/dev/null 2>&1 || { echo >&2 "Python 3 is not installed. Please install Python 3."; exit 1; }
-	@echo "Setting up Python virtual environment..."
-	@test -d $(VENV_DIR) || python3 -m venv $(VENV_DIR)
-	@echo "Upgrading pip in virtual environment..."
-	@$(VENV_DIR)/bin/python -m pip install --upgrade pip
-	@echo "Installing pre-commit..."
-	@$(VENV_DIR)/bin/pip install pre-commit
-	@echo "Installing pre-commit hooks..."
-	@$(VENV_DIR)/bin/pre-commit install
-	@echo "✅ Development environment setup complete."
-
-
 # Start all services defined in docker-compose
 up:
 	docker compose up -d --build

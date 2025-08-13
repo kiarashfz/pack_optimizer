@@ -103,22 +103,24 @@ func TestCalculatePackApi(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a request body
-			body, _ := json.Marshal(tt.requestBody)
+			body, mErr := json.Marshal(tt.requestBody)
+			assert.NoError(t, mErr)
 
 			// Create a new HTTP request
 			req := httptest.NewRequest("POST", "/api/v1/packs/calculate", bytes.NewReader(body))
 			req.Header.Set("Content-Type", "application/json")
 
 			// Perform the request and get the response
-			resp, _ := app.Test(req, -1) // -1 for no timeout
+			resp, testErr := app.Test(req, -1) // -1 for no timeout
+			assert.NoError(t, testErr)
 
 			// Assert the status code
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
 			// Assert the response body
 			var responseBody map[string]interface{}
-			err := json.NewDecoder(resp.Body).Decode(&responseBody)
-			assert.NoError(t, err)
+			decodeErr := json.NewDecoder(resp.Body).Decode(&responseBody)
+			assert.NoError(t, decodeErr)
 			assert.Equal(t, tt.expectedBody, responseBody)
 		})
 	}

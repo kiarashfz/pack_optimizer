@@ -2,8 +2,9 @@ package sql_repo
 
 import (
 	"context"
-	"gorm.io/gorm"
 	"pack_optimizer/internal/domain"
+
+	"gorm.io/gorm"
 )
 
 // PackRepo is a repository that provides methods to interact with the Pack data in the database.

@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"pack_optimizer/internal/handler/pack_handler"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // SetupRoutes registers all application routes.

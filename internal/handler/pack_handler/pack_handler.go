@@ -1,9 +1,10 @@
 package pack_handler
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"pack_optimizer/internal/usecase/pack_usecase"
 	"pack_optimizer/pkg/validator"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type PackHandler struct {

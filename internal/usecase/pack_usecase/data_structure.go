@@ -27,7 +27,11 @@ func (pq PriorityQueue) Swap(i, j int) {
 }
 
 func (pq *PriorityQueue) Push(x any) {
-	node := x.(*Node)
+	node, ok := x.(*Node)
+	if !ok {
+		panic("PriorityQueue: Push non-Node type")
+	}
+
 	node.index = len(*pq)
 	*pq = append(*pq, node)
 }
