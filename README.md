@@ -44,6 +44,7 @@ The project is structured according to the principles of Clean Architecture to e
 * **Docker**
 * **Docker Compose**
 * **Go** (for local development and testing)
+* **Python3 and pip or pipx** (for pre-commit)
 
 ### ▶️ How to Run
 
@@ -69,6 +70,51 @@ The project is structured according to the principles of Clean Architecture to e
 4.  **Access the application:**
     Open your browser and navigate to [http://localhost:8080](http://localhost:8080).
 
+### 🛠️ Development Setup
+
+
+#### 1️⃣ Install pre-commit
+
+**Ubuntu:**
+
+```bash
+sudo apt install pipx
+pipx ensurepath
+pipx install pre-commit
+```
+
+**MacOS:**
+
+```bash
+brew install pre-commit
+pipx ensurepath
+pipx install pre-commit
+```
+
+#### 2️⃣ Install Golang tools
+If you don't have the necessary Go tools installed, you can run:
+
+```bash
+make dev-setup
+```
+This command will install the required Go tools such as `goimports` and `golangci-lint` if they are not already installed.
+#### 3️⃣ Install pre-commit hooks
+To ensure code quality and consistency, the project uses pre-commit hooks. You can install them by running:
+
+```bash
+pre-commit install
+```
+This command sets up the pre-commit hooks defined in the `.pre-commit-config.yaml` file, which will automatically run checks on your code before each commit.
+
+#### 4️⃣ lint your code
+To lint your code, you can use the following command:
+
+```bash
+make lint
+```
+
+
+
 ### 🔧 Makefile Functionality
 
 The included `Makefile` provides convenient commands for managing the application's lifecycle.
@@ -78,6 +124,8 @@ The included `Makefile` provides convenient commands for managing the applicatio
 * `make restart`: Restarts all services.
 * `make logs`: Streams the logs for all services.
 * `make test`: Runs all unit and integration tests with verbose output and race detection.
+* `make dev-setup`: Installs necessary Go tools if missing.
+* `make lint`: Runs `goimports` and `golangci-lint` on the codebase.
 
 ### 🟧 Postman Collection
 
@@ -103,5 +151,5 @@ make test
 ```
 ### ☁️ Deployment
 
-The application is successfully deployed and accessible at:  
+The application is successfully deployed and accessible at:
 👉 [https://kiarash-pack-optimizer.up.railway.app/](https://kiarash-pack-optimizer.up.railway.app/)

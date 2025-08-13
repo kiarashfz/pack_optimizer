@@ -1,4 +1,4 @@
-.PHONY: lint up down restart logs test
+.PHONY: dev-setup lint up down restart logs test
 
 # Locate the golangci-lint executable
 GOLANGCI_LINT := $(shell which golangci-lint 2>/dev/null || echo $(shell go env GOPATH)/bin/golangci-lint)
@@ -15,8 +15,11 @@ $(GOIMPORTS):
 	@echo "Installing goimports..."
 	@go install golang.org/x/tools/cmd/goimports@latest
 
+# Install necessary installation tools if they are not already installed
+dev-setup: $(GOLANGCI_LINT) $(GOIMPORTS)
+
 # The lint target now has both tools as prerequisites
-lint: $(GOLANGCI_LINT) $(GOIMPORTS)
+lint: dev-setup
 	@echo "Running goimports..."
 	@find . -type f -name "*.go" | xargs -r $(GOIMPORTS) -w
 	@echo "Running golangci-lint..."

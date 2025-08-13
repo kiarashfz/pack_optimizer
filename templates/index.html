@@ -135,8 +135,7 @@
 
             // Check for a non-ok response and display the specific API error message
             if (!response.ok) {
-                const errorMessage = data.error || "An unknown error occurred.";
-                errorTextSpan.textContent = errorMessage;
+                errorTextSpan.textContent = data.error || "An unknown error occurred.";
                 errorMessageDiv.classList.remove('hidden');
                 resultBox.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No results to display due to an error.</p>';
                 return;
