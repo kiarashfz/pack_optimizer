@@ -20,8 +20,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/pack_optimizer ./
 # Use a minimal Alpine Linux image for a tiny and secure final image.
 FROM alpine:3.18.4
 
-# Install ca-certificates for secure HTTPS connections.
-RUN apk add --no-cache ca-certificates
+# Install ca-certificates and create a non-root user in a single layer.
+RUN apk add --no-cache ca-certificates \
+    && addgroup -S appgroup \
+    && adduser -S appuser -G appgroup
 
 # Create a non-root user and group to run the application securely.
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
