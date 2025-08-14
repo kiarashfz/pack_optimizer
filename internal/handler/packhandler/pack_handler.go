@@ -4,6 +4,7 @@ package packhandler
 import (
 	"errors"
 	"pack_optimizer/internal/domain"
+	"pack_optimizer/internal/handler/customerrrors"
 	"pack_optimizer/internal/usecase/packusecase"
 	"pack_optimizer/pkg/validator"
 
@@ -40,7 +41,7 @@ func (h *PackHandler) CalculatePacks(c *fiber.Ctx) error {
 		}
 
 		// For all other errors, we return a 500.
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "An unexpected error occurred"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": customerrrors.ErrUnexpected})
 	}
 	return c.Status(fiber.StatusOK).JSON(output)
 }

@@ -1,3 +1,4 @@
+// Package http provides the HTTP server implementation for the application.
 package http
 
 import (
