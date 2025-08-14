@@ -40,7 +40,11 @@ func (uc *PackUseCase) CalculatePacks(ctx context.Context, orderQty int) (Calcul
 
 	packs, err := uc.packRepo.GetAllPacks(ctx)
 	if err != nil {
-		return CalculatePacksOutput{}, err
+		if errors.Is(err, domain.ErrNoPacksAvailable) {
+			return CalculatePacksOutput{}, fmt.Errorf("failed to retrieve pack sizes: %w", err)
+		}
+		// For other errors, we wrap with a generic message.
+		return CalculatePacksOutput{}, fmt.Errorf("use case failed to get packs: %w", err)
 	}
 
 	packSizes := make([]int, 0, len(packs))

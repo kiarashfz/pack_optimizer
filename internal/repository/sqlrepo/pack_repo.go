@@ -3,6 +3,7 @@ package sqlrepo
 
 import (
 	"context"
+	"fmt"
 	"pack_optimizer/internal/domain"
 
 	"gorm.io/gorm"
@@ -22,5 +23,12 @@ func NewPackRepo(db *gorm.DB) domain.PackRepository {
 func (r *PackRepo) GetAllPacks(ctx context.Context) ([]domain.Pack, error) {
 	var packs []domain.Pack
 	err := r.db.WithContext(ctx).Select("size").Order("size ASC").Find(&packs).Error
-	return packs, err
+	if err != nil {
+		// wrapping the error to provide more context
+		return nil, fmt.Errorf("failed to retrieve packs: %w", err)
+	}
+	if len(packs) == 0 {
+		return nil, domain.ErrNoPacksAvailable
+	}
+	return packs, nil
 }
