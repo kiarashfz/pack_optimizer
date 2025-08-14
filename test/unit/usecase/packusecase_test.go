@@ -131,6 +131,56 @@ func TestCalculatePacks_DynamicGeneratedCases(t *testing.T) {
 	}
 }
 
+func TestCalculatePacks_DynamicRandomPackSizes(t *testing.T) {
+	// Helper to get a crypto-safe random int between min and max (inclusive)
+	randInt := func(min, max int64) int {
+		nBig, err := crand.Int(crand.Reader, big.NewInt(max-min+1))
+		if err != nil {
+			t.Fatalf("failed to generate random number: %v", err)
+		}
+		return int(nBig.Int64() + min)
+	}
+
+	// Generate between 3 and 8 pack sizes in ascending order
+	numPacks := randInt(3, 8)
+	var packSizes []domain.Pack
+	currentSize := randInt(50, 200) // start small
+
+	for i := 0; i < numPacks; i++ {
+		// Increase size by at least 1 and up to 10,000 per step
+		increment := randInt(1, 2000)
+		currentSize += increment
+		packSizes = append(packSizes, domain.Pack{Size: currentSize})
+	}
+
+	minimumPackSize := packSizes[0].Size
+	uc := packusecase.NewPackUseCase(&dynamicMockRepo{packs: packSizes})
+
+	fmt.Println("Generated Pack Sizes:", packSizes)
+	// Generate between 10 and 30 random orders for this pack set
+	numOrders := randInt(5, 10)
+	for i := 0; i < numOrders; i++ {
+		orderQty := randInt(1, 50000) // random order quantity
+		t.Run(fmt.Sprintf("Run_Random_Pack_Size_With_Order_%d", orderQty), func(t *testing.T) {
+			result, err := uc.CalculatePacks(context.Background(), orderQty)
+			assert.NoError(t, err)
+			assert.GreaterOrEqual(t, result.TotalItems, orderQty, "total items must cover the order quantity")
+			assert.Greater(t, result.TotalPacks, 0, "should have at least one pack")
+			assert.NotEmpty(t, result.Packs, "pack list should not be empty")
+			assert.Equal(t, orderQty, result.TotalItems-result.RemainingItems, "total items should equal order quantity plus remaining items")
+
+			packsSum := 0
+			for _, pack := range result.Packs {
+				packsSum += pack.Size * pack.Count
+			}
+			assert.Equal(t, result.TotalItems, packsSum, "sum of pack sizes should equal total items")
+			assert.Equal(t, packsSum-result.RemainingItems, orderQty, "remaining items should equal total items minus order quantity")
+			assert.Less(t, result.RemainingItems, minimumPackSize, "remaining items should be less than the smallest pack size")
+		})
+	}
+
+}
+
 func TestCalculatePacks_RepoError(t *testing.T) {
 	uc := packusecase.NewPackUseCase(&errorMockRepo{})
 
