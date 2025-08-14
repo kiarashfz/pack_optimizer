@@ -98,6 +98,27 @@ func TestCalculatePackApi(t *testing.T) {
 			expectedStatus: fiber.StatusBadRequest,
 			expectedBody:   map[string]interface{}{"error": "invalid request"},
 		},
+		{
+			name:           "BigQuantity_ValidInput_1000000",
+			requestBody:    map[string]interface{}{"quantity": 1000000},
+			expectedStatus: fiber.StatusOK,
+			expectedBody: map[string]interface{}{
+				"total_items":     float64(1000000),
+				"remaining_items": float64(0),
+				"total_packs":     float64(200),
+				"packs": []interface{}{
+					map[string]interface{}{"size": float64(5000), "count": float64(200)},
+				},
+			},
+		},
+		{
+			name:           "Overflow_ValidInput_999999999",
+			requestBody:    map[string]interface{}{"quantity": 999999999},
+			expectedStatus: fiber.StatusBadRequest,
+			expectedBody: map[string]interface{}{
+				"error": "Key: 'CalculatePacksReq.Quantity' Error:Field validation for 'Quantity' failed on the 'max' tag",
+			},
+		},
 	}
 
 	for _, tt := range tests {
