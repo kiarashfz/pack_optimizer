@@ -1,10 +1,12 @@
 package main
 
 import (
-	"log"
 	"pack_optimizer/configs"
 	"pack_optimizer/db"
 	"pack_optimizer/internal/http"
+	"pack_optimizer/pkg/logpkg"
+
+	"github.com/rs/zerolog/log"
 
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/postgres"
@@ -12,13 +14,15 @@ import (
 )
 
 func main() {
+	logpkg.InitLogger()
+
 	// Load environment variables and configurations
 	cfg := configs.LoadConfig()
 
 	// Connect to DB
 	gormDB, err := gorm.Open(postgres.Open(cfg.DB.GormDSN), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect to DB: %v", err)
+		log.Info().Msg("Starting server on :3000")
 	}
 
 	// Run migrations

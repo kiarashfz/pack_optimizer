@@ -3,7 +3,8 @@ package db
 
 import (
 	"embed"
-	"log"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -18,18 +19,18 @@ func RunMigrations(databaseURL string) {
 	// Create an iofs source driver from the embedded filesystem
 	source, err := iofs.New(migrationsFS, "migrations")
 	if err != nil {
-		log.Fatalf("Could not create migration source: %v", err)
+		log.Fatal().Err(err).Msg("Could not create iofs source driver")
 	}
 
 	// Pass the iofs source driver to migrate.New
 	m, err := migrate.NewWithSourceInstance("iofs", source, databaseURL)
 	if err != nil {
-		log.Fatalf("Could not create migration instance: %v", err)
+		log.Fatal().Err(err).Msg("Failed to create migration instance")
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("Could not apply migrations: %v", err)
+		log.Fatal().Err(err).Msg("Failed to apply database migrations")
 	}
 
-	log.Println("Migrations applied successfully!")
+	log.Info().Msg("Database migrations applied successfully")
 }

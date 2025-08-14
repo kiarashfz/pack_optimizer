@@ -41,7 +41,7 @@ func (h *PackHandler) CalculatePacks(c *fiber.Ctx) error {
 		}
 
 		// For all other errors, we return a 500.
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": customerrrors.ErrUnexpected})
+		return customerrrors.ErrUnexpected
 	}
 	return c.Status(fiber.StatusOK).JSON(output)
 }

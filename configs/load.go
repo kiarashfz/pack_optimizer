@@ -3,8 +3,9 @@ package configs
 
 import (
 	"fmt"
-	"log"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/go-playground/validator/v10"
 
@@ -22,20 +23,20 @@ func LoadConfig() Config {
 	v.AutomaticEnv()
 
 	if err := v.ReadInConfig(); err != nil {
-		log.Printf("No .env file found, relying on environment variables only: %v", err)
+		log.Fatal().Err(err).Msg("Error reading .env file")
 	}
 
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", ""))
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
-		log.Fatalf("unable to decode config: %v", err)
+		log.Fatal().Err(err).Msg("Error unmarshalling configuration")
 	}
 
 	// --- Validation for required fields using a validation library ---
 	validate := validator.New()
 	if err := validate.Struct(cfg); err != nil {
-		log.Fatalf("Configuration validation failed: %v", err)
+		log.Fatal().Err(err).Msg("Configuration validation failed")
 	}
 
 	// Generate DSNs from loaded values

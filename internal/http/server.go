@@ -2,16 +2,19 @@
 package http
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"pack_optimizer/configs"
+	"pack_optimizer/internal/handler/customerrrors"
+	"pack_optimizer/internal/handler/middlewares"
 	"pack_optimizer/internal/handler/packhandler"
 	"pack_optimizer/internal/repository/sqlrepo"
 	"pack_optimizer/internal/usecase/packusecase"
 	"pack_optimizer/templates"
 	"syscall"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -35,11 +38,13 @@ func NewServer(db *gorm.DB) *Server {
 	engine := html.NewFileSystem(http.FS(templates.FS), ".html")
 
 	app := fiber.New(fiber.Config{
-		Views: engine,
+		ErrorHandler: customerrrors.ErrorHandler,
+		Views:        engine,
 	})
 
-	app.Use(recover.New()) // Recover from panics
-	app.Use(logger.New())  // Log requests to the console
+	app.Use(recover.New())                   // Recover from panics
+	app.Use(logger.New())                    // Log requests to the console
+	app.Use(middlewares.RequestIDMiddleware) // Add a unique request ID to each request for log tracing
 
 	return &Server{
 		App: app,
@@ -60,20 +65,20 @@ func (s *Server) Run(appConfig configs.App) {
 	go func() {
 		// Listen() is blocking, so this will run in the background.
 		if err := s.App.Listen(":" + appConfig.Port); err != nil {
-			log.Fatalf("Fiber server failed to start: %v", err)
+			log.Fatal().Err(err).Msg("Failed to start Fiber server")
 		}
 	}()
 
 	// Block until a shutdown signal is received.
 	<-shutdownChan
 
-	log.Println("Received shutdown signal. Starting graceful shutdown...")
+	log.Info().Msg("Received shutdown signal, initiating graceful shutdown...")
 
 	// Use Fiber's built-in Shutdown() method.
 	if err := s.App.Shutdown(); err != nil {
-		log.Fatalf("Error during graceful shutdown: %v", err)
+		log.Error().Err(err).Msg("Failed to gracefully shut down Fiber server")
 	}
-	log.Println("Fiber server has been gracefully shut down.")
+	log.Info().Msg("Fiber server has been gracefully shut down.")
 
 	// Gracefully close the database connection.
 	sqlDB, err := s.DB.DB()
@@ -84,9 +89,9 @@ func (s *Server) Run(appConfig configs.App) {
 			log.Printf("Error during database shutdown: %v", err)
 		}
 	}
-	log.Println("Database connection has been gracefully closed.")
+	log.Printf("Database connection has been closed.")
 
-	log.Println("Server has been successfully shut down.")
+	log.Info().Msg("Server has been stopped gracefully.")
 }
 
 func (s *Server) setupRoutes() {
