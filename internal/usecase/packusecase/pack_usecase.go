@@ -1,4 +1,5 @@
-package pack_usecase
+// Package packusecase provides methods for calculating optimal pack combinations.
+package packusecase
 
 import (
 	"container/heap"

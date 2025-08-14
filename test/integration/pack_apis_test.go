@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http/httptest"
-	"pack_optimizer/internal/handler/pack_handler"
-	"pack_optimizer/internal/repository/sql_repo"
-	"pack_optimizer/internal/usecase/pack_usecase"
+	"pack_optimizer/internal/handler/packhandler"
+	"pack_optimizer/internal/repository/sqlrepo"
+	"pack_optimizer/internal/usecase/packusecase"
 	"testing"
 
 	"pack_optimizer/internal/domain"
@@ -37,9 +37,9 @@ func TestCalculatePackApi(t *testing.T) {
 	gormDB.Create(&packs)
 
 	// 3. Initialize the real application components with the mock database
-	packRepo := sql_repo.NewPackRepo(gormDB)
-	packUseCase := pack_usecase.NewPackUseCase(packRepo)
-	packHandler := pack_handler.NewPackHandler(packUseCase)
+	packRepo := sqlrepo.NewPackRepo(gormDB)
+	packUseCase := packusecase.NewPackUseCase(packRepo)
+	packHandler := packhandler.NewPackHandler(packUseCase)
 
 	// 4. Setup the Fiber app with the real handler
 	app := fiber.New()

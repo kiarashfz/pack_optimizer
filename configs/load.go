@@ -1,3 +1,4 @@
+// Package configs provides functionality to load and validate application configuration.
 package configs
 
 import (

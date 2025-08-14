@@ -5,10 +5,10 @@ import (
 	"pack_optimizer/configs"
 	"pack_optimizer/db"
 	"pack_optimizer/internal/handler"
-	"pack_optimizer/internal/handler/pack_handler"
+	"pack_optimizer/internal/handler/packhandler"
 	"pack_optimizer/internal/http"
-	"pack_optimizer/internal/repository/sql_repo"
-	"pack_optimizer/internal/usecase/pack_usecase"
+	"pack_optimizer/internal/repository/sqlrepo"
+	"pack_optimizer/internal/usecase/packusecase"
 
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/postgres"
@@ -29,9 +29,9 @@ func main() {
 	db.RunMigrations(cfg.DB.MigrateDSN)
 
 	// Initialize the repository, use case, and handler layers
-	packRepo := sql_repo.NewPackRepo(gormDB)
-	packUseCase := pack_usecase.NewPackUseCase(packRepo)
-	packHandler := pack_handler.NewPackHandler(packUseCase)
+	packRepo := sqlrepo.NewPackRepo(gormDB)
+	packUseCase := packusecase.NewPackUseCase(packRepo)
+	packHandler := packhandler.NewPackHandler(packUseCase)
 
 	// Initialize and start the HTTP server
 	app := http.NewServer()

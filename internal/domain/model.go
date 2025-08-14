@@ -1,3 +1,4 @@
+// Package domain defines the core data structures and interfaces for the application.
 package domain
 
 import "context"

@@ -1,4 +1,4 @@
-package pack_usecase
+package packusecase
 
 type Pack struct {
 	Size  int `json:"size"`

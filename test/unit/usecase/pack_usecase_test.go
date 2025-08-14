@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"pack_optimizer/internal/domain"
-	"pack_optimizer/internal/usecase/pack_usecase"
+	"pack_optimizer/internal/usecase/packusecase"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,7 +27,7 @@ func (m *errorMockRepo) GetAllPacks(_ context.Context) ([]domain.Pack, error) {
 }
 
 func TestCalculatePacks(t *testing.T) {
-	uc := pack_usecase.NewPackUseCase(&dynamicMockRepo{packs: []domain.Pack{
+	uc := packusecase.NewPackUseCase(&dynamicMockRepo{packs: []domain.Pack{
 		{Size: 250},
 		{Size: 500},
 		{Size: 1000},
@@ -38,73 +38,73 @@ func TestCalculatePacks(t *testing.T) {
 	tests := []struct {
 		name     string
 		orderQty int
-		expected pack_usecase.CalculatePacksOutput
+		expected packusecase.CalculatePacksOutput
 		err      error
 	}{
 		{
 			name:     "Order 0 -> should return error",
 			orderQty: 0,
-			expected: pack_usecase.CalculatePacksOutput{},
+			expected: packusecase.CalculatePacksOutput{},
 			err:      errors.New("order quantity must be greater than 0"),
 		},
 		{
 			name:     "Negative order -> should return error",
 			orderQty: -100,
-			expected: pack_usecase.CalculatePacksOutput{},
+			expected: packusecase.CalculatePacksOutput{},
 			err:      errors.New("order quantity must be greater than 0"),
 		},
 		{
 			name:     "Order 1 -> 1 x 250",
 			orderQty: 1,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     250,
 				RemainingItems: 249,
 				TotalPacks:     1,
-				Packs:          []pack_usecase.Pack{{Size: 250, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 250, Count: 1}},
 			},
 			err: nil,
 		},
 		{
 			name:     "Order 250 -> 1 x 250",
 			orderQty: 250,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     250,
 				RemainingItems: 0,
 				TotalPacks:     1,
-				Packs:          []pack_usecase.Pack{{Size: 250, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 250, Count: 1}},
 			},
 			err: nil,
 		},
 		{
 			name:     "Order 251 -> 1 x 500",
 			orderQty: 251,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     500,
 				RemainingItems: 249,
 				TotalPacks:     1,
-				Packs:          []pack_usecase.Pack{{Size: 500, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 500, Count: 1}},
 			},
 			err: nil,
 		},
 		{
 			name:     "Order 501 -> 1 x 500 + 1 x 250",
 			orderQty: 501,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     750,
 				RemainingItems: 249,
 				TotalPacks:     2,
-				Packs:          []pack_usecase.Pack{{Size: 250, Count: 1}, {Size: 500, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 250, Count: 1}, {Size: 500, Count: 1}},
 			},
 			err: nil,
 		},
 		{
 			name:     "Order 12001 -> 2 x 5000 + 1 x 2000 + 1 x 250",
 			orderQty: 12001,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     12250,
 				RemainingItems: 249,
 				TotalPacks:     4,
-				Packs: []pack_usecase.Pack{
+				Packs: []packusecase.Pack{
 					{Size: 250, Count: 1},
 					{Size: 2000, Count: 1},
 					{Size: 5000, Count: 2},
@@ -115,22 +115,22 @@ func TestCalculatePacks(t *testing.T) {
 		{
 			name:     "Order exactly a large pack -> 1 x 5000",
 			orderQty: 5000,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     5000,
 				RemainingItems: 0,
 				TotalPacks:     1,
-				Packs:          []pack_usecase.Pack{{Size: 5000, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 5000, Count: 1}},
 			},
 			err: nil,
 		},
 		{
 			name:     "Order not divisible by any pack size",
 			orderQty: 1234,
-			expected: pack_usecase.CalculatePacksOutput{
+			expected: packusecase.CalculatePacksOutput{
 				TotalItems:     1250,
 				RemainingItems: 16,
 				TotalPacks:     2,
-				Packs:          []pack_usecase.Pack{{Size: 250, Count: 1}, {Size: 1000, Count: 1}},
+				Packs:          []packusecase.Pack{{Size: 250, Count: 1}, {Size: 1000, Count: 1}},
 			},
 			err: nil,
 		},
@@ -155,11 +155,11 @@ func TestCalculatePacks(t *testing.T) {
 }
 
 func TestCalculatePacks_RepoError(t *testing.T) {
-	uc := pack_usecase.NewPackUseCase(&errorMockRepo{})
+	uc := packusecase.NewPackUseCase(&errorMockRepo{})
 
 	// Test case for repository error
 	result, err := uc.CalculatePacks(context.Background(), 10)
 	assert.Error(t, err)
 	assert.Equal(t, "database connection failed", err.Error())
-	assert.Equal(t, pack_usecase.CalculatePacksOutput{}, result)
+	assert.Equal(t, packusecase.CalculatePacksOutput{}, result)
 }

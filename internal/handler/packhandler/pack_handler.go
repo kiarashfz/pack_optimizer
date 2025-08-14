@@ -1,17 +1,18 @@
-package pack_handler
+// Package packhandler provides HTTP handlers for pack-related operations.
+package packhandler
 
 import (
-	"pack_optimizer/internal/usecase/pack_usecase"
+	"pack_optimizer/internal/usecase/packusecase"
 	"pack_optimizer/pkg/validator"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type PackHandler struct {
-	packUseCase *pack_usecase.PackUseCase
+	packUseCase *packusecase.PackUseCase
 }
 
-func NewPackHandler(packUseCase *pack_usecase.PackUseCase) *PackHandler {
+func NewPackHandler(packUseCase *packusecase.PackUseCase) *PackHandler {
 	return &PackHandler{packUseCase: packUseCase}
 }
 

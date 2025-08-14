@@ -1,6 +1,7 @@
-package pack_usecase
+// Package packusecase provides use cases for managing packs.
+package packusecase
 
-// A node represents a state: total items, total packs, pack count
+// Node represents a state: total items, total packs, pack count
 type Node struct {
 	totalItems int   // total items shipped so far
 	totalPacks int   // number of packs used
@@ -8,7 +9,7 @@ type Node struct {
 	index      int   // index for heap interface
 }
 
-// Priority: first by totalItems, then by totalPacks
+// PriorityQueue first by totalItems, then by totalPacks
 type PriorityQueue []*Node
 
 func (pq PriorityQueue) Len() int { return len(pq) }

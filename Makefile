@@ -8,7 +8,7 @@ GOIMPORTS := $(shell which goimports 2>/dev/null || echo $(shell go env GOPATH)/
 # Rule to install golangci-lint if it's not found.
 $(GOLANGCI_LINT):
 	@echo "Installing golangci-lint..."
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@GOPROXY=direct go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0
 
 # Rule to install goimports if it's not found
 $(GOIMPORTS):

@@ -33,10 +33,6 @@ WORKDIR /app
 # Copy the statically-built binary from the 'builder' stage.
 COPY --from=builder --chown=appuser:appgroup /app/pack_optimizer .
 
-# Copy the necessary templates and database migrations from the builder stage.
-# We need migrations at runtime for the 'go-migrate' tool to work.
-COPY --from=builder --chown=appuser:appgroup /app/templates ./templates
-COPY --from=builder --chown=appuser:appgroup /app/db/migrations ./db/migrations
 # Copy the .env file for local development
 COPY --from=builder --chown=appuser:appgroup /app/.env ./
 

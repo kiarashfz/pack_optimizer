@@ -1,8 +1,8 @@
 package configs
 
 type Config struct {
-	App `mapstructure:",squash"` // Squash allows the fields of App to be directly accessible in Config
-	DB  `mapstructure:",squash"`
+	App App    `mapstructure:",squash"` // Squash allows the fields of App to be directly accessible in Config
+	DB  DB     `mapstructure:",squash"`
 	Env string `mapstructure:"ENV" validate:"required"`
 }
 

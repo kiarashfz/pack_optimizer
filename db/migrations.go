@@ -1,16 +1,28 @@
+// Package db handles database migrations.
 package db
 
 import (
+	"embed"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
+
+//go:embed migrations/*
+var migrationsFS embed.FS
 
 // RunMigrations executes all pending SQL migration files.
 func RunMigrations(databaseURL string) {
-	m, err := migrate.New("file://db/migrations", databaseURL)
+	// Create an iofs source driver from the embedded filesystem
+	source, err := iofs.New(migrationsFS, "migrations")
+	if err != nil {
+		log.Fatalf("Could not create migration source: %v", err)
+	}
+
+	// Pass the iofs source driver to migrate.New
+	m, err := migrate.NewWithSourceInstance("iofs", source, databaseURL)
 	if err != nil {
 		log.Fatalf("Could not create migration instance: %v", err)
 	}

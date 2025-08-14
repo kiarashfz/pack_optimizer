@@ -1,4 +1,5 @@
-package sql_repo
+// Package sqlrepo provides database operations for pack-related data.
+package sqlrepo
 
 import (
 	"context"
