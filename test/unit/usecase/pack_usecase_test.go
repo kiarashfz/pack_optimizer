@@ -160,6 +160,6 @@ func TestCalculatePacks_RepoError(t *testing.T) {
 	// Test case for repository error
 	result, err := uc.CalculatePacks(context.Background(), 10)
 	assert.Error(t, err)
-	assert.Equal(t, "database connection failed", err.Error())
+	assert.Equal(t, "use case failed to get packs: database connection failed", err.Error())
 	assert.Equal(t, packusecase.CalculatePacksOutput{}, result)
 }
