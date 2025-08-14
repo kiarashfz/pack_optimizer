@@ -1,4 +1,4 @@
-package usecase_test
+package usecasetest
 
 import (
 	"context"
