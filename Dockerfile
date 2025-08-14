@@ -37,6 +37,8 @@ COPY --from=builder --chown=appuser:appgroup /app/pack_optimizer .
 # We need migrations at runtime for the 'go-migrate' tool to work.
 COPY --from=builder --chown=appuser:appgroup /app/templates ./templates
 COPY --from=builder --chown=appuser:appgroup /app/db/migrations ./db/migrations
+# Copy the .env file for local development
+COPY --from=builder --chown=appuser:appgroup /app/.env ./
 
 # Expose the port on which the application listens.
 EXPOSE 8080

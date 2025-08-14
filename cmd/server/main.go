@@ -19,14 +19,14 @@ func main() {
 	// Load environment variables and configurations
 	cfg := configs.LoadConfig()
 
-	// Run database migrations
-	db.RunMigrations(cfg.MigrateDSN)
-
-	// Connect to the database
-	gormDB, err := gorm.Open(postgres.Open(cfg.GormDSN), &gorm.Config{})
+	// Connect to DB
+	gormDB, err := gorm.Open(postgres.Open(cfg.DB.GormDSN), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to initialize database, got error: %v", err)
+		log.Fatalf("failed to connect to DB: %v", err)
 	}
+
+	// Run migrations
+	db.RunMigrations(cfg.DB.MigrateDSN)
 
 	// Initialize the repository, use case, and handler layers
 	packRepo := sql_repo.NewPackRepo(gormDB)
@@ -37,5 +37,5 @@ func main() {
 	app := http.NewServer()
 	handler.SetupRoutes(app, packHandler)
 
-	log.Fatal(app.Listen(":" + cfg.Port))
+	log.Fatal(app.Listen(":" + cfg.App.Port))
 }
